@@ -33,4 +33,6 @@ df = DataFrame(d)
 fig,axes = plt.subplots(2,1)
 df.plot(ax=axes[0],style='-o',sharex=True)
 calories.plot(ax=axes[1],style='-o',sharex=True)
+#add some space between subplots to avoid overlapping dates
+plt.subplots_adjust(hspace=0.8)
 plt.show()
