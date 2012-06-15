@@ -22,6 +22,15 @@ this_month=fs.food_entries_get_month()
 
 rdates = [datetime.fromtimestamp(float(i['date_int'])*60*60*24) for i in this_month]
 fats = [i['fat'] for i in this_month] 
-ts=Series(fats,index=rdates)
-ts.plot(marker='o')
+proteins = [i['protein'] for i in this_month] 
+carbs = [i['carbohydrate'] for i in this_month] 
+calories = DataFrame({'calories' : Series([i['calories'] for i in this_month],index=rdates)})
+
+d={'fat':Series(fats,index=rdates),
+        'carb':Series(carbs,index=rdates),
+        'protein':Series(proteins,index=rdates)}
+df = DataFrame(d)
+fig,axes = plt.subplots(2,1)
+df.plot(ax=axes[0],style='-o',sharex=True)
+calories.plot(ax=axes[1],style='-o',sharex=True)
 plt.show()
