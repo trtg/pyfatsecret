@@ -11,10 +11,15 @@ Foods
 ###food_add_favorite()
 ###food_delete_favorite() 
 ###food_get() 
+implemented
 ###foods_get_favorites() 
+implemented
 ###foods_get_most_eaten() 
+implemented
 ###foods_get_recently_eaten() 
+implemented
 ###foods_search() 
+implemented
 
 Recipes
 ---
@@ -34,6 +39,7 @@ Saved Meals
 ###saved_meal_delete() 
 ###saved_meal_edit() 
 ###saved_meals_get() 
+implemented
 ###saved_meal_item_add() 
 ###saved_meal_item_delete() 
 ###saved_meal_item_edit() 
@@ -41,7 +47,7 @@ Saved Meals
 
 Exercises
 ---
-#exercises_get 
+###exercises_get 
 
 Profile - Management
 ---
@@ -56,6 +62,7 @@ Profile - Food Diary
 ###food_entries_copy_saved_meal 
 ###food_entries_get 
 ###food_entries_get_month 
+implemented
 ###food_entry_create 
 ###food_entry_delete 
 ###food_entry_edit 
@@ -65,6 +72,7 @@ Profile - Exercise Diary
 ###exercise_entries_commit_day 
 ###exercise_entries_get 
 ###exercise_entries_get_month 
+implemented
 ###exercise_entries_save_template 
 ###exercise_entry_edit 
 
@@ -72,4 +80,5 @@ Profile - Weight Diary
 ---
 ###weight_update 
 ###weights_get_month
+implemented
 
