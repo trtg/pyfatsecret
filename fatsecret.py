@@ -2,6 +2,7 @@ import hashlib#for computing hash
 from rauth.service import OAuth1Service #see https://github.com/litl/rauth for more info
 import shelve #for persistent caching of tokens, hashes,etc.
 import time
+import datetime 
 #get your consumer key and secret after registering as a developer here: https://oauth.withings.com/en/partner/add
 
 #FIXME add method to set default units and make it an optional argument to the constructor
@@ -101,24 +102,29 @@ class Fatsecret:
                 header_auth=False)
         return response.content
 
-    #FIXME allow specifying particular month(s)
-    def food_entries_get_month(self,date=None):
+    def food_entries_get_month(self,date=datetime.datetime.now()):
         params={'method': 'food_entries.get_month','format':'json'} 
-        if date!=None:
-            params['date']=int(round(time.mktime(date.timetuple())/60/60/24))
+        params['date']=int(round(time.mktime(date.timetuple())/60/60/24))
         response=self.oauth.get(
                 'http://platform.fatsecret.com/rest/server.api',
                 params=params,
                 access_token=self.access_token,
                 access_token_secret=self.access_token_secret,
                 header_auth=False)
-        #print response.content
-        tmp=response.content['month']['day']
+
+        print response.content
+        if response.content['month'].get('day'):
+            tmp=response.content['month']['day']
+        else:
+            #months without data will still contain a 'month' key, but not a 'day' key
+            tmp=None
         #result=[(i['carbohydrate'],i['fat'],i['protein'],i['calories'],i['date_int']) for i in tmp] 
         return tmp
 
     
     def saved_meals_get(self):
+        """Returns a list where each item is formatted like 
+        {"saved_meal": {"meals": "Lunch,Other", "saved_meal_description": "A high impact energy meal - terrific for the great outdoors!", "saved_meal_id": "1111111", "saved_meal_name": "Power Snack" }"""
         params={'method': 'saved_meals.get','format':'json'} 
         response=self.oauth.get(
                 'http://platform.fatsecret.com/rest/server.api',
@@ -126,5 +132,49 @@ class Fatsecret:
                 access_token=self.access_token,
                 access_token_secret=self.access_token_secret,
                 header_auth=False)
-        return response.content
+        if response.content.get('saved_meals'):
+            tmp=response.content['saved_meals']['saved_meal']
+        else:
+            tmp=None
+        return tmp
 
+    def weights_get_month(self,date=datetime.datetime.now()):
+        """Return date_int and weight in kg for each day in requested month"""
+        params={'method': 'weights.get_month','format':'json'} 
+        params['date']=int(round(time.mktime(date.timetuple())/60/60/24))
+        response=self.oauth.get(
+                'http://platform.fatsecret.com/rest/server.api',
+                params=params,
+                access_token=self.access_token,
+                access_token_secret=self.access_token_secret,
+                header_auth=False)
+        print response.content
+        #note that every valid data point has weight_kg and date_int fields but 
+        #may also optionally have a weight_comment field
+        #also note that you in response.content you also get from_date_int and to_date_int keys
+        #that specify the range of dates included in the requested month
+        if response.content['month'].get('day'):
+            tmp=response.content['month']['day']
+        else: 
+            tmp=None
+        return tmp
+
+
+    def exercise_entries_get_month(self,date=datetime.datetime.now()):
+        """Return date_int and calories burned for each day in requested month"""
+        params={'method': 'exercise_entries.get_month','format':'json'} 
+        params['date']=int(round(time.mktime(date.timetuple())/60/60/24))
+        response=self.oauth.get(
+                'http://platform.fatsecret.com/rest/server.api',
+                params=params,
+                access_token=self.access_token,
+                access_token_secret=self.access_token_secret,
+                header_auth=False)
+        print response.content
+        #note that every valid data point has weight_kg and date_int fields but 
+        #may also optionally have a weight_comment field
+        if response.content['month'].get('day'):
+            tmp=response.content['month']['day']
+        else: 
+            tmp=None
+        return tmp
