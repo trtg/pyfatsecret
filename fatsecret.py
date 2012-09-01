@@ -78,7 +78,20 @@ class Fatsecret:
 
     
     def food_get(self,food_id):
-        params={'method': 'saved_meals.get','food_id':food_id,'format':'json'} 
+        """Returns nutrition information and the corresponding fatsecret information URL for the specified food_id
+        food_ids may be obtained by using foods_search()"""
+        params={'method': 'food.get','food_id':food_id,'format':'json'} 
+        response=self.oauth.get(
+                'http://platform.fatsecret.com/rest/server.api',
+                params=params,
+                access_token=self.access_token,
+                access_token_secret=self.access_token_secret,
+                header_auth=False)
+        return response.content
+
+    def foods_get_favorites(self):
+        params={'method': 'foods.get_favorites','oauth_token': self.access_token,'format':'json'} 
+
         response=self.oauth.get(
                 'http://platform.fatsecret.com/rest/server.api',
                 params=params,
