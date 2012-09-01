@@ -100,7 +100,8 @@ class Fatsecret:
                 access_token=self.access_token,
                 access_token_secret=self.access_token_secret,
                 header_auth=False)
-        return response.content
+        if response.content.get('foods'):
+            return response.content['foods']['food']
 
     def foods_get_most_eaten(self,meal=None):
         params={'method': 'foods.get_most_eaten','oauth_token': self.access_token,'format':'json'} 
@@ -113,7 +114,23 @@ class Fatsecret:
                 access_token=self.access_token,
                 access_token_secret=self.access_token_secret,
                 header_auth=False)
-        return response.content
+        if response.content.get('foods'):
+            return response.content['foods']['food']
+
+    def foods_get_recently_eaten(self,meal=None):
+        params={'method': 'foods.get_recently_eaten','oauth_token': self.access_token,'format':'json'} 
+        if meal in ['breakfast','lunch','dinner','other']: 
+            params['meal']=meal
+
+        response=self.oauth.get(
+                'http://platform.fatsecret.com/rest/server.api',
+                params=params,
+                access_token=self.access_token,
+                access_token_secret=self.access_token_secret,
+                header_auth=False)
+
+        if response.content.get('foods'):
+            return response.content['foods']['food']
 
     def foods_search(self,search_expression,page_number=None,max_results=None):
         params={'method': 'foods.search','oauth_token': self.access_token,'search_expression':search_expression,'format':'json'} 
