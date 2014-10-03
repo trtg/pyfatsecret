@@ -1,84 +1,70 @@
 pyfatsecret
 ===========
 
-This library provides a lightweight python wrapper for the fatsecret API with the goal of making it easier to visualize the data retrieved from the API. To that end, this library will usually return lists of identical elements for ease of plotting, discarding extra header fields that the fatsecret API otherwise includes. For example, exercise_entries_get_month() returns a list of dates and calories burned without the 'month','day', 'from_date_int', 'to_date_int' keys that the API normally returns 
+This library provides a lightweight python wrapper for the Fatsecret API with the goal of making it easier to visualize 
+the data retrieved from the API. To that end, this library will usually return lists of identical elements for ease of 
+plotting, discarding extra header fields that the Fatsecret API otherwise includes. All API calls return a either a 
+single or list of JSON dictionaries.
 
+Fatsecret supports both delegated and undelegated calls. Only through delegated calls can you access Fatsecret user
+profile data.
 
-The methods provided by the API are grouped according to category:
+Config
+------
 
-Foods
----
-###food_add_favorite()
-###food_delete_favorite() 
-###food_get() 
-implemented
-###foods_get_favorites() 
-implemented
-###foods_get_most_eaten() 
-implemented
-###foods_get_recently_eaten() 
-implemented
-###foods_search() 
-implemented
+Register for a developer account to get a consumer key and secret key from http://platform.fatsecret.com/api/
 
-Recipes
----
-###recipe_add_favorite() 
-###recipe_delete_favorite() 
-###recipe_get() 
-###recipes_get_favorites() 
-###recipes_search() 
+Documentation
+-------------
+http://pyfatsecret.readthedocs.org/en/latest/
 
-Recipe Types
----
-###recipe_types_get() 
+Usage
+-----
 
-Saved Meals
----
-###saved_meal_create() 
-###saved_meal_delete() 
-###saved_meal_edit() 
-###saved_meals_get() 
-implemented
-###saved_meal_item_add() 
-###saved_meal_item_delete() 
-###saved_meal_item_edit() 
-###saved_meal_items_get() 
+### Undelegated API Calls
 
-Exercises
----
-###exercises_get 
+    from fatsecret import Fatsecret
 
-Profile - Management
----
-###profile_create 
-###profile_get 
-###profile_get_auth 
-###profile_request_script_session_key 
+    fs = Fatsecret(consumer_key, consumer_secret)
 
-Profile - Food Diary
----
-###food_entries_copy 
-###food_entries_copy_saved_meal 
-###food_entries_get 
-###food_entries_get_month 
-implemented
-###food_entry_create 
-###food_entry_delete 
-###food_entry_edit 
+    foods = fs.foods_search("Tacos")
 
-Profile - Exercise Diary
----
-###exercise_entries_commit_day 
-###exercise_entries_get 
-###exercise_entries_get_month 
-implemented
-###exercise_entries_save_template 
-###exercise_entry_edit 
+### Delegated API Calls With Callback URL
 
-Profile - Weight Diary
----
-###weight_update 
-###weights_get_month
-implemented
+If you provide a callback URL then Fatsecret will return the Verifier PIN in the request object.
 
+    from fatsecret import Fatsecret
+    
+    fs = Fatsecret(consumer_key, consumer_secret)
+    
+    auth_url = fs.get_authorized_url(callback_url='http://example.com')
+    
+Redirect to the auth_url in your web app for the user to authorize access. Once authorized
+you will automatically be redirected to the callback_url. From there you can pull the oauth_verifier
+from the request object if the user allowed access
+    
+    pin = request.args.get('oauth_verifier')
+    session_token = fs.authenticate(pin)
+    
+### Delegated API Call Without Callback URL
+If your app can't support callback URLs then you will have to provide a way for the user to enter the PIN
+
+    from fatsecret import Fatsecret
+    
+    fs = Fatsecret(consumer_key, consumer_secret)
+    
+    print("Browse to the following URL in your webbrowser: {}".format(fs.get_authorize_url()))
+    session_token = fs.authenticate(input("Enter PIN: "))
+    
+    
+### Open Existing Delegated Session
+If you store the session_token returned by fs.authenticate() or fs.profile_get_auth() then you can open a session by
+handing the session_token when you create your new object
+
+    from fatsecret import Fatsecret
+    
+    session_token = None #  You will have to use your imagination for how you plan to store / retrieve these tokens
+    
+    fs = Fatsecret(consumer_key, consumer_secret, session_token=session_token)
+    
+Refer to the basic examples in the source code for further guidance
