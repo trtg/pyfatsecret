@@ -12,7 +12,6 @@ setup(
     name='pyfatsecret',
     version='0.2',
     description='Python wrapper for FatSecret REST API',
-    packages=[''],
     url='github.walexnelson/pysecret',
     license='MIT',
     author='Alex Nelson',
