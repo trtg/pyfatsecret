@@ -1,0 +1,1 @@
+Search.setIndex({objnames:{},objtypes:{},objects:{},envversion:43,titleterms:{indic:0,welcom:0,tabl:0,pyfatsecret:0,document:0},terms:{content:0,modul:0,search:0,index:0,page:0},titles:["Welcome to pyfatsecret&#8217;s documentation!"],filenames:["index"]})
