@@ -1,2 +1,0 @@
-pyfatsecret setup
-===========
