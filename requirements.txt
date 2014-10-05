@@ -1,4 +1,4 @@
 rauth==0.7.0
 requests==2.4.1
-sphinx-rtd-theme==0.1.6
+sphinx-readable-theme==1.1.0
 sphinxcontrib-napoleon==0.2.8
