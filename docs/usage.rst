@@ -1,49 +1,108 @@
-pyfatsecret usage
-===========
+.. _usage:
+
+OAuth Examples
+==============
+
+Fatsecret supports 3-legged OAuth authentication. You can also authenticate to a profile that your application
+created.
+
+Web Application
+---------------
+
+.. code-block:: python
+
+    from flask import Flask, redirect, url_for, request
+    from fatsecret import Fatsecret
+
+    consumer_key = 'Replace with your key'
+    consumer_secret = 'Replace with your key'
+
+    app = Flask(__name__)
+    fs = Fatsecret(consumer_key, consumer_secret)
+
+    @app.route("/")
+    def index():
+        if request.args.get('oauth_verifier'):
+
+            verifier_pin = request.args.get('oauth_verifier')
+
+            # Store token as desired. The session is now authenticated
+            session_token = fs.authenticate(verifier_pin)
+
+            return redirect(url_for('profile'))
+
+        else:
+            return "<a href={0}>Authenticate Access Here</a>".format(url_for('authenticate'))
 
 
-### Undelegated API Calls
+    @app.route("/auth")
+    def authenticate():
+
+        auth_url = fs.get_authorize_url(callback_url="http://127.0.0.1:5000")
+
+        return redirect(auth_url)
+
+
+    @app.route("/profile")
+    def profile():
+        food = fs.foods_get_most_eaten()
+
+        return "<h1>Profile</h1><div><strong>Most Eaten Foods</strong><br>{}</div>"\
+            .format(food)
+
+
+    if __name__ == "__main__":
+        app.run()
+
+CLI Application
+---------------
+
+.. code-block:: python
 
     from fatsecret import Fatsecret
 
     fs = Fatsecret(consumer_key, consumer_secret)
 
-    foods = fs.foods_search("Tacos")
+    auth_url = fs.get_authorize_url()
 
-### Delegated API Calls With Callback URL
+    print("Browse to the following URL in your browser to authorize access:\n{}"\
+        .format(auth_url)
 
-If you provide a callback URL then Fatsecret will return the Verifier PIN in the request object.
-
-    from fatsecret import Fatsecret
-
-    fs = Fatsecret(consumer_key, consumer_secret)
-
-    auth_url = fs.get_authorized_url(callback_url='http://example.com')
-
-Redirect to the auth_url in your web app for the user to authorize access. Once authorized
-you will automatically be redirected to the callback_url. From there you can pull the oauth_verifier
-from the request object if the user allowed access
-
-    pin = request.args.get('oauth_verifier')
+    pin = input("Enter the PIN provided by FatSecret: ")
     session_token = fs.authenticate(pin)
 
-### Delegated API Call Without Callback URL
-If your app can't support callback URLs then you will have to provide a way for the user to enter the PIN
+    foods = fs.foods_get_most_eaten()
+    print("Most Eaten Food Results: {}".format(len(foods)))
+
+Use New Profiles for Your App
+-----------------------------
+
+You're able to directly authenticate to any profile that your app has created
+
+.. code-block:: python
 
     from fatsecret import Fatsecret
 
-    fs = Fatsecret(consumer_key, consumer_secret)
+    fs = Fatsecret(consumer_key, secret_key)
 
-    print("Browse to the following URL in your webbrowser: {}".format(fs.get_authorize_url()))
-    session_token = fs.authenticate(input("Enter PIN: "))
+    session_token = fs.profile_create('new_user_001')
 
+Fatsecret states that each ``session_token`` persists indefinitely for profiles created by your app
+so you can store it and use it later as needed.
 
-### Open Existing Delegated Session
-If you store the session_token returned by fs.authenticate() or fs.profile_get_auth() then you can open a session by
-handing the session_token when you create your new object
+**Note**: Using a ``session_token`` from a previously authorized session for a Fatsecret user profile
+is also possible but Fatsecret isn't as clear about the lifetime of those tokens.
 
-    from fatsecret import Fatsecret
+.. code-block:: python
 
-    session_token = None #  You will have to use your imagination for how you plan to store / retrieve these tokens
+    session_token = # retrieve from your database
 
-    fs = Fatsecret(consumer_key, consumer_secret, session_token=session_token)
+Or you can save the ``user_id`` instead and get the ``session_token`` from Fatsecret each time. Keep in mind that
+this will only work for profiles created by your application. You'll still need to go through the 3-legged OAuth
+process for profiles you didn't create.
+
+.. code-block:: python
+
+    session_token = fs.profile_get_auth('new_user_001')
+
+    new_session = Fatsecret(consumer_key, secret_key, session_token=session_token)

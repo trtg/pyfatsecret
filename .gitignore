@@ -1,0 +1,6 @@
+*.pyc
+.idea
+.idea/*
+docs/_build/*
+*.tar.gz
+fatsecret.egg*

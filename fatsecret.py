@@ -87,8 +87,6 @@ class Fatsecret:
 
         :param verifier: PIN displayed to user or returned by authorize_url when callback url is provided
         :type verifier: int
-        :param user_id: Can authenticate with user id
-        :type user_id: str
         """
 
         session_token = self.oauth.get_access_token(self.request_token, self.request_token_secret,
@@ -107,14 +105,18 @@ class Fatsecret:
 
     @staticmethod
     def unix_time(dt):
+        """Convert the provided datetime into number of days since the Epoch
 
+        :param dt: Date to convert
+        :type dt: datetime
+        """
         epoch = datetime.datetime.utcfromtimestamp(0)
         delta = dt - epoch
         return delta.days
 
     @staticmethod
     def valid_response(response):
-        """Helper function to check JSON response for errors
+        """Helper function to check JSON response for errors and to strip headers
 
         :param response: JSON response from API call
         :type response: dict
@@ -180,8 +182,11 @@ class Fatsecret:
         """ Add a food to a user's favorite according to the parameters specified.
 
         :param food_id: The ID of the favorite food to add.
+        :type food_id: str
         :param serving_id: Only required if number_of_units is present. This is the ID of the favorite serving.
+        :type serving_id: str
         :param number_of_units: Only required if serving_id is present. This is the favorite number of servings.
+        :type number_of_units: float
         """
 
         params = {'method': 'food.add_favorite', 'format': 'json', 'food_id': food_id}
@@ -197,8 +202,11 @@ class Fatsecret:
         """ Delete the food to a user's favorite according to the parameters specified.
 
         :param food_id: The ID of the favorite food to add.
+        :type food_id: str
         :param serving_id: Only required if number_of_units is present. This is the ID of the favorite serving.
+        :type serving_id: str
         :param number_of_units: Only required if serving_id is present. This is the favorite number of servings.
+        :type number_of_units: float
         """
 
         params = {'method': 'food.delete_favorite', 'format': 'json', 'food_id': food_id}
@@ -287,6 +295,7 @@ class Fatsecret:
         """ Add a recipe to a user's favorite.
 
         :param recipe_id: The ID of the favorite recipe to add.
+        :type recipe_id: str
         """
 
         params = {'method': 'recipes.add_favorites', 'format': 'json', 'recipe_id': recipe_id}
@@ -298,6 +307,7 @@ class Fatsecret:
         """ Delete a recipe to a user's favorite.
 
         :param recipe_id: The ID of the favorite recipe to delete.
+        :type recipe_id: str
         """
 
         params = {'method': 'recipes.delete_favorites', 'format': 'json', 'recipe_id': recipe_id}
@@ -398,10 +408,14 @@ class Fatsecret:
         """ Records a change to a user's saved meal.
 
         :param meal_id: The ID of the food entry to edit.
+        :type meal_id: str
         :param new_name: The new name of the saved meal.
+        :type new_name: str
         :param meal_desc: The new description of the saved meal.
+        :type meal_desc: str
         :param meals: The new comma separated list of the types of meal this saved meal is suitable for.
             Valid meal types are "breakfast", "lunch", "dinner" and "other".
+        :type meals: str
         """
 
         params = {'method': 'saved_meal.edit', 'format': 'json', 'saved_meal_id': meal_id}
@@ -435,10 +449,15 @@ class Fatsecret:
         """ Adds a food to a user's saved meal according to the parameters specified.
 
         :param meal_id: The ID of the saved meal.
+        :type meal_id: str
         :param food_id: The ID of the food to add to the saved meal.
+        :type food_id: str
         :param food_entry_name: The name of the food to add to the saved meal.
+        :type food_entry_name: str
         :param serving_id: The ID of the serving of the food to add to the saved meal.
+        :type serving_id: str
         :param num_units: The number of servings of the food to add to the saved meal.
+        :type num_units: float
         """
         params = {'method': 'saved_meal_item.add', 'format': 'json', 'saved_meal_id': meal_id,
                   'food_id': food_id, 'food_entry_name': food_entry_name, 'serving_id': serving_id,
@@ -539,6 +558,7 @@ class Fatsecret:
         """ Returns the authentication information for a nominated user.
 
         :param user_id: The user_id specified in profile.create.
+        :type user_id: str
         """
 
         params = {'method': 'profile.get_auth', 'format': 'json', 'user_id': user_id}
@@ -571,8 +591,10 @@ class Fatsecret:
         """ Copies the food entries for a specified saved meal to a specified meal.
 
         :param meal_id: The ID of the saved meal
+        :type meal_id: str
         :param meal: The type of meal eaten. Valid meal types are "breakfast", "lunch", "dinner" and "other".
-        :param date: The number of days since January 1, 1970 (default value is the current day).
+        :type meal: str
+        :param date: Day to copy meal to. (default value is the current day).
         :type date: datetime
         """
 
@@ -594,7 +616,9 @@ class Fatsecret:
         :: You must specify either date or food_entry_id.
 
         :param food_entry_id: The ID of the food entry to retrieve. You must specify either date or food_entry_id.
-        :param date: The number of days since January 1, 1970 (default value is the current day).
+        :type food_entry_id: str
+        :param date: Day to filter food entries by (default value is the current day).
+        :type date: datetime
         """
 
         params = {'method': 'food_entries.get', 'format': 'json'}
@@ -614,7 +638,8 @@ class Fatsecret:
 
         Use this call to display nutritional information to users about their food intake for a nominated month.
 
-        :param date: The number of days since January 1, 1970 (default value is the current day).
+        :param date: Day in the month to return (default value is the current day to get current month).
+        :type date: datetime
         """
 
         params = {'method': 'food_entries.get_month', 'format': 'json'}
@@ -629,11 +654,17 @@ class Fatsecret:
         """ Records a food diary entry for the user according to the parameters specified.
 
         :param food_id: The ID of the food eaten.
+        :type food_id: str
         :param food_entry_name: The name of the food entry.
+        :type food_entry_name: str
         :param serving_id: The ID of the serving
+        :type serving_id: str
         :param number_of_units: The number of servings eaten.
+        :type number_of_units: float
         :param meal: The type of meal eaten. Valid meal types are "breakfast", "lunch", "dinner" and "other".
-        :param date: The number of days since January 1, 1970 (default value is the current day).
+        :type meal: str
+        :param date: Day to create food entry on (default value is the current day).
+        :type date: datetime
         """
 
         params = {'method': 'food_entry.create', 'format': 'json', 'food_id': food_id,
@@ -650,6 +681,7 @@ class Fatsecret:
         """ Deletes the specified food entry for the user.
 
         :param food_entry_id: The ID of the food entry to delete.
+        :type food_entry_id: str
         """
 
         params = {'method': 'food_entry.delete', 'format': 'json', 'food_entry_id': food_entry_id}
@@ -665,10 +697,15 @@ class Fatsecret:
         the date for which a food diary entry was recorded the original entry must be deleted and a new entry recorded.
 
         :param food_entry_id: The ID of the food entry to edit.
+        :type food_entry_id: str
         :param entry_name: The new name of the food entry.
+        :type entry_name: str
         :param serving_id: The new ID of the serving to change to.
+        :type serving_id: str
         :param num_units: The new number of servings eaten.
+        :type num_units: float
         :param meal: The new type of meal eaten. Valid meal types are "breakfast", "lunch", "dinner" and "other".
+        :type meal: str
         """
 
         params = {'method': 'food_entry.edit', 'food_entry_id': food_entry_id, 'format': 'json'}
@@ -691,7 +728,8 @@ class Fatsecret:
     def exercises_entries_commit_day(self, date=None):
         """ Saves the default exercise entries for the user on a nominated date.
 
-        :param date: The number of days since January 1, 1970 (default value is the current day).
+        :param date: Date to save default exercises on (default value is the current day).
+        :type date: datetime
         """
 
         params = {'method': 'exercises_entries.commit_day', 'format': 'json'}
@@ -709,7 +747,8 @@ class Fatsecret:
         These entries will either be "template" entries (which a user may override for any given day of the week)
         or saved exercise entry values.
 
-        :param date: The number of days since January 1, 1970 (default value is the current day).
+        :param date: Day of exercises to retrieve (default value is the current day).
+        :type date: datetime
         """
 
         params = {'method': 'exercises_entries.get', 'format': 'json'}
@@ -725,7 +764,8 @@ class Fatsecret:
         the month specified. Use this call to display total energy expenditure information to users about their
         exercise and activities for a nominated month.
 
-        :param date: The number of days since January 1, 1970 (default value is the current day).
+        :param date: Day within month to retrieve (default value is the current day for the current month).
+        :type date: datetime
         """
 
         params = {'method': 'exercises_entries.get_month', 'format': 'json'}
@@ -741,10 +781,11 @@ class Fatsecret:
         entries for nominated days of the week.
 
         :param days: The days of the week specified as bits with Sunday being the 1st bit and Saturday being the
-            last and then converted to an Int. For example Tuesday and Thursday would be represented as 00010100 in
-            bits or 20 in Int where Tuesday is the 3rd bit from the right and Thursday being the 5th.
-            Must be between 0 and 128.
-        :param date: The number of days since January 1, 1970 (default value is the current day).
+            last. For example Tuesday and Thursday would be represented as 00010100 in bits where Tuesday is the 3rd
+            bit from the right and Thursday being the 5th.
+        :type days: str
+        :param date: Day of exercises to use as the template (default value is the current day).
+        :type date: datetime
         """
         params = {'method': 'exercises_entries.get_month', 'format': 'json', 'days': int(days)}
 
@@ -766,13 +807,19 @@ class Fatsecret:
         another. An exercise is removed from the day when all of the time allocated to it is shifted to other exercises.
 
         :param shift_to_id: The ID of the exercise type to shift to.
+        :type shift_to_id: str
         :param shift_from_id: The ID of the exercise type to shift from.
+        :type shift_from_id: str
         :param minutes: The number of minutes to shift.
-        :param date: The number of days since January 1, 1970 (default value is the current day).
+        :type minutes: int
+        :param date: Day to edit (default value is the current day).
+        :type date: datetime
         :param shift_to_name: Only required if shift_to_id is 0 (exercise type "Other").
             This is the name of the new custom exercise type to shift to.
+        :type shift_to_name: str
         :param shift_from_name: Only required if shift_from_id is 0 (exercise type "Other").
             This is the name of the custom exercise type to shift from.
+        :type shift_from_name: str
         """
 
         params = {'method': 'exercise_entry.edit', 'format': 'json', 'shift_to_id': shift_to_id,
@@ -804,13 +851,20 @@ class Fatsecret:
         First time weigh-ins require the goal_weight_kg and current_height_cm parameters.
 
         :param current_weight_kg: The current weight of the user in kilograms.
-        :param date: The number of days since January 1, 1970 (default value is the current day).
+        :type current_weight_kg: float
+        :param date: Day to for weight record (default value is the current day).
+        :type date: datetime
         :param weight_type: The weight measurement type for this user profile. Valid types are "kg" and "lb"
+        :type weight_type: str
         :param height_type: The height measurement type for this user profile. Valid types are "cm" and "inch"
+        :type height_type: str
         :param goal_weight_kg: The goal weight of the user in kilograms. This is required for the first weigh-in.
+        :type goal_weight_kg: float
         :param current_height_cm: The current height of the user in centimetres. This is required for the first
             weigh-in. You can only set this for the first time (subsequent updates will not change a user's height)
+        :type current_height_cm: float
         :param comment: A comment for this weigh-in.
+        :type comment: str
         """
 
         params = {'method': 'weight.update', 'format': 'json', 'current_weight_kg': current_weight_kg,
@@ -832,7 +886,8 @@ class Fatsecret:
         """ Returns the recorded weights for a user for the month specified. Use this call to display a user's
         weight chart or log of weight changes for a nominated month.
 
-        :param date: The number of days since January 1, 1970 (default value is the current day).
+        :param date: Day within month to return (default value is the current day for the current month).
+        :type date: datetime
         """
 
         params = {'method': 'weights.get_month', 'format': 'json'}
